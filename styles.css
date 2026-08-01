@@ -753,6 +753,11 @@ h1 {
   background: rgba(232, 155, 121, 0.12);
 }
 
+.remove-card-button.is-confirming {
+  color: #fff;
+  background: var(--peach-dark);
+}
+
 .edit-card-button:focus-visible,
 .remove-card-button:focus-visible {
   outline: 3px solid var(--ink);

@@ -209,15 +209,13 @@ function renderManagerCards() {
     actions.className = "manager-card-actions";
     actions.append(editButton);
 
-    if (card.id.startsWith("custom-")) {
-      const removeButton = document.createElement("button");
-      removeButton.className = "remove-card-button";
-      removeButton.type = "button";
-      removeButton.dataset.cardId = card.id;
-      removeButton.textContent = "Remove";
-      removeButton.setAttribute("aria-label", `Remove card from ${card.giver}`);
-      actions.append(removeButton);
-    }
+    const removeButton = document.createElement("button");
+    removeButton.className = "remove-card-button";
+    removeButton.type = "button";
+    removeButton.dataset.cardId = card.id;
+    removeButton.textContent = "Remove";
+    removeButton.setAttribute("aria-label", `Remove card from ${card.giver}`);
+    actions.append(removeButton);
 
     copy.append(message, meta);
     item.append(copy, actions);
@@ -359,8 +357,23 @@ cancelEditButton.addEventListener("click", () => {
 managerList.addEventListener("click", (event) => {
   const removeButton = event.target.closest(".remove-card-button");
   if (removeButton) {
-    cards = cards.filter((card) => card.id !== removeButton.dataset.cardId);
-    if (editingCardId.value === removeButton.dataset.cardId) resetCardForm();
+    if (removeButton.dataset.confirming !== "true") {
+      managerList.querySelectorAll(".remove-card-button.is-confirming").forEach((button) => {
+        button.dataset.confirming = "false";
+        button.classList.remove("is-confirming");
+        button.textContent = "Remove";
+      });
+      removeButton.dataset.confirming = "true";
+      removeButton.classList.add("is-confirming");
+      removeButton.textContent = "Confirm";
+      managerStatus.textContent = "Tap Confirm to permanently remove this card from this device.";
+      return;
+    }
+
+    const removedCardId = removeButton.dataset.cardId;
+    cards = cards.filter((card) => card.id !== removedCardId);
+    if (editingCardId.value === removedCardId) resetCardForm();
+    if (currentCard?.id === removedCardId) currentCard = null;
     saveCards();
     refreshDeckAfterCardChange();
     managerStatus.textContent = "Card removed from this device.";
