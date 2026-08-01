@@ -205,8 +205,22 @@ function renderManagerCards() {
     editButton.textContent = "Edit";
     editButton.setAttribute("aria-label", `Edit card from ${card.giver}`);
 
+    const actions = document.createElement("div");
+    actions.className = "manager-card-actions";
+    actions.append(editButton);
+
+    if (card.id.startsWith("custom-")) {
+      const removeButton = document.createElement("button");
+      removeButton.className = "remove-card-button";
+      removeButton.type = "button";
+      removeButton.dataset.cardId = card.id;
+      removeButton.textContent = "Remove";
+      removeButton.setAttribute("aria-label", `Remove card from ${card.giver}`);
+      actions.append(removeButton);
+    }
+
     copy.append(message, meta);
-    item.append(copy, editButton);
+    item.append(copy, actions);
     managerList.append(item);
   });
 }
@@ -343,6 +357,16 @@ cancelEditButton.addEventListener("click", () => {
 });
 
 managerList.addEventListener("click", (event) => {
+  const removeButton = event.target.closest(".remove-card-button");
+  if (removeButton) {
+    cards = cards.filter((card) => card.id !== removeButton.dataset.cardId);
+    if (editingCardId.value === removeButton.dataset.cardId) resetCardForm();
+    saveCards();
+    refreshDeckAfterCardChange();
+    managerStatus.textContent = "Card removed from this device.";
+    return;
+  }
+
   const editButton = event.target.closest(".edit-card-button");
   if (!editButton) return;
 
