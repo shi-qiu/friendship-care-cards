@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A small deck of practical, loving gifts from your people."
+    />
+    <title>A Little Help, With Love</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the cards</a>
+    <main id="main" class="app-shell">
+      <header class="intro">
+        <p class="eyebrow">A little help, with love</p>
+        <h1>Your people are here.</h1>
+        <p class="lede">
+          Pick a card whenever you could use a softer day. No need to save them
+          for a special occasion.
+        </p>
+      </header>
+
+      <section class="experience" aria-labelledby="card-heading">
+        <h2 id="card-heading" class="sr-only">Care card deck</h2>
+        <p id="count" class="count" aria-live="polite"></p>
+
+        <div id="deck-view" class="view">
+          <div class="deck-wrap" aria-hidden="true">
+            <span class="sparkle sparkle-one">✦</span>
+            <span class="sparkle sparkle-two">✧</span>
+            <div class="deck-shadow-card"></div>
+            <div class="deck-shadow-card second"></div>
+            <div class="card-back">
+              <div class="card-back-inner">
+                <span class="tiny-mark">♥</span>
+                <span>Made for this moment</span>
+              </div>
+            </div>
+          </div>
+          <button id="draw-button" class="button button-primary" type="button">
+            Draw a card
+            <span aria-hidden="true">→</span>
+          </button>
+          <p class="gentle-note">Take what you need. Your village means it.</p>
+        </div>
+
+        <div id="reveal-view" class="view" hidden>
+          <article id="care-card" class="care-card" tabindex="-1">
+            <p class="card-label">This one says…</p>
+            <p id="card-message" class="card-message"></p>
+            <p class="giver">With love, <strong id="card-giver"></strong></p>
+          </article>
+          <div class="actions">
+            <button id="redeem-button" class="button button-primary" type="button">
+              Redeem this gift
+              <span aria-hidden="true">♥</span>
+            </button>
+            <button id="another-button" class="button button-secondary" type="button">
+              Draw another
+            </button>
+          </div>
+        </div>
+
+        <div id="complete-view" class="view complete-view" hidden>
+          <div class="celebration" aria-hidden="true">
+            <span>✦</span><span>♥</span><span>✦</span>
+          </div>
+          <h2 tabindex="-1">You let your village love you.</h2>
+          <p>
+            Every card has been used. We hope each one made the days feel a
+            little lighter.
+          </p>
+          <div class="complete-seal" aria-hidden="true">all<br />held</div>
+        </div>
+
+        <div id="confirmation" class="toast" role="status" aria-live="polite" hidden>
+          Gift redeemed — help is on the way.
+        </div>
+
+        <section id="redeemed-section" class="redeemed-section" aria-labelledby="redeemed-heading" hidden>
+          <details id="redeemed-details">
+            <summary>
+              <span>
+                <span class="redeemed-kicker">Already held</span>
+                <span id="redeemed-heading" class="redeemed-title">Redeemed gifts</span>
+              </span>
+              <span id="redeemed-count" class="redeemed-count"></span>
+            </summary>
+            <div id="redeemed-list" class="redeemed-list"></div>
+          </details>
+        </section>
+      </section>
+
+      <footer>
+        <span aria-hidden="true">♥</span> Made by friends who love you
+      </footer>
+    </main>
+  </body>
+</html>
