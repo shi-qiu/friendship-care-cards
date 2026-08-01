@@ -1,50 +1,20 @@
 const defaultCards = [
   {
     id: "rest-and-reset",
-    message: "宝宝交给我两个小时。你可以补觉、洗个澡，或者什么都不做。",
-    giver: "小雅",
+    message: "宝宝交给我们两个小时。你可以补觉、洗个澡，或者什么都不做。",
+    giver: "Qiu & Wang",
     redeemed: false,
   },
   {
     id: "dinner-drop",
-    message: "晚饭交给我。你挑个晚上，我带着热乎乎的饭菜来。",
-    giver: "诺拉",
+    message: "晚饭交给我。你挑个晚上，我们带着热乎乎的饭菜来",
+    giver: "邱",
     redeemed: false,
   },
   {
-    id: "laundry-magic",
-    message: "把那堆衣服交给我吧，我来洗、叠好，再帮你收起来。",
-    giver: "佳怡",
-    redeemed: false,
-  },
-  {
-    id: "quiet-company",
-    message: "我来陪你坐一会儿。不用招待、不用收拾，也不用勉强聊天。",
-    giver: "莉娅",
-    redeemed: false,
-  },
-  {
-    id: "tiny-errands",
-    message: "把超市和药房的清单发给我，外面的跑腿都交给我。",
-    giver: "佩雅",
-    redeemed: false,
-  },
-  {
-    id: "morning-rescue",
-    message: "找个早晨，我带着咖啡、早餐，还有一双能帮忙的手来找你。",
-    giver: "苏菲",
-    redeemed: false,
-  },
-  {
-    id: "fresh-air",
-    message: "我们一起慢慢散个步吧。我来推婴儿车，也会带好零食。",
-    giver: "艾薇",
-    redeemed: false,
-  },
-  {
-    id: "kitchen-reset",
-    message: "你安心抱宝宝，或者什么都不做；我来把厨房收拾清爽。",
-    giver: "艾琳",
+    id: "morning-shopping",
+    message: "找个早晨，我带着咖啡, baked goods，找你去逛街。",
+    giver: "医生",
     redeemed: false,
   },
 ];
