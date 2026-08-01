@@ -92,11 +92,76 @@
             <div id="redeemed-list" class="redeemed-list"></div>
           </details>
         </section>
+
+        <button id="manage-button" class="manage-trigger" type="button">
+          <span aria-hidden="true">✎</span>
+          Manage cards
+        </button>
       </section>
 
       <footer>
         <span aria-hidden="true">♥</span> Made by friends who love you
       </footer>
     </main>
+
+    <dialog id="manager-dialog" class="manager-dialog" aria-labelledby="manager-heading">
+      <div class="manager-shell">
+        <header class="manager-header">
+          <div>
+            <p class="manager-kicker">Just for this browser</p>
+            <h2 id="manager-heading">Your card deck</h2>
+          </div>
+          <button id="manager-close" class="icon-button" type="button" aria-label="Close card manager">
+            ×
+          </button>
+        </header>
+
+        <p class="manager-note">
+          Cards you add or edit are saved only on this device. Other visitors
+          will still see the original deck.
+        </p>
+
+        <form id="card-form" class="card-form">
+          <input id="editing-card-id" type="hidden" />
+          <label for="manager-message">Gift message</label>
+          <textarea
+            id="manager-message"
+            name="message"
+            rows="4"
+            maxlength="180"
+            placeholder="例如：这个周末我来照顾宝宝，你好好休息。"
+            required
+          ></textarea>
+
+          <label for="manager-giver">From</label>
+          <input
+            id="manager-giver"
+            name="giver"
+            type="text"
+            maxlength="40"
+            placeholder="你的名字"
+            required
+          />
+
+          <div class="form-actions">
+            <button id="save-card-button" class="button button-primary" type="submit">
+              Add to the deck
+            </button>
+            <button id="cancel-edit-button" class="button button-secondary compact-button" type="button" hidden>
+              Cancel edit
+            </button>
+          </div>
+          <p id="manager-status" class="manager-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <section class="manager-cards" aria-labelledby="manager-list-heading">
+          <div class="manager-list-heading">
+            <h3 id="manager-list-heading">Cards on this device</h3>
+            <span id="manager-card-count"></span>
+          </div>
+          <div id="manager-list" class="manager-list"></div>
+        </section>
+      </div>
+    </dialog>
   </body>
 </html>

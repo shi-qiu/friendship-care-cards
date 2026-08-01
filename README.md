@@ -2,7 +2,8 @@
 
 A warm, mobile-first deck of care gifts for a new mother, built with plain HTML,
 CSS, and JavaScript. Redeemed cards are saved in the browser when local storage
-is available.
+is available. The built-in card manager can add and edit cards on the current
+device; those personal changes are not shared with other visitors.
 
 ## Local preview
 

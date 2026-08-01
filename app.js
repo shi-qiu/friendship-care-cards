@@ -1,4 +1,4 @@
-const cards = [
+const defaultCards = [
   {
     id: "rest-and-reset",
     message: "宝宝交给我两个小时。你可以补觉、洗个澡，或者什么都不做。",
@@ -49,7 +49,8 @@ const cards = [
   },
 ];
 
-const STORAGE_KEY = "friend-cards-redeemed-v1";
+const LEGACY_STORAGE_KEY = "friend-cards-redeemed-v1";
+const CARDS_STORAGE_KEY = "friend-cards-device-deck-v2";
 const animationDuration = window.matchMedia("(prefers-reduced-motion: reduce)").matches
   ? 0
   : 560;
@@ -69,17 +70,53 @@ const redeemedSection = document.querySelector("#redeemed-section");
 const redeemedDetails = document.querySelector("#redeemed-details");
 const redeemedCount = document.querySelector("#redeemed-count");
 const redeemedList = document.querySelector("#redeemed-list");
+const manageButton = document.querySelector("#manage-button");
+const managerDialog = document.querySelector("#manager-dialog");
+const managerClose = document.querySelector("#manager-close");
+const cardForm = document.querySelector("#card-form");
+const editingCardId = document.querySelector("#editing-card-id");
+const managerMessage = document.querySelector("#manager-message");
+const managerGiver = document.querySelector("#manager-giver");
+const saveCardButton = document.querySelector("#save-card-button");
+const cancelEditButton = document.querySelector("#cancel-edit-button");
+const managerStatus = document.querySelector("#manager-status");
+const managerCardCount = document.querySelector("#manager-card-count");
+const managerList = document.querySelector("#manager-list");
 
+let cards = defaultCards.map((card) => ({ ...card }));
 let currentCard = null;
 let isAnimating = false;
 let confirmationTimer;
 
-function loadRedeemedCards() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    if (!Array.isArray(saved)) return;
+function isValidStoredCard(card) {
+  return (
+    card &&
+    typeof card.id === "string" &&
+    typeof card.message === "string" &&
+    card.message.trim() &&
+    typeof card.giver === "string" &&
+    card.giver.trim() &&
+    typeof card.redeemed === "boolean"
+  );
+}
 
-    const savedIds = new Set(saved.filter((id) => typeof id === "string"));
+function loadCards() {
+  try {
+    const savedCards = JSON.parse(localStorage.getItem(CARDS_STORAGE_KEY) || "null");
+    if (Array.isArray(savedCards) && savedCards.length && savedCards.every(isValidStoredCard)) {
+      cards = savedCards.map((card) => ({
+        id: card.id,
+        message: card.message.trim().slice(0, 180),
+        giver: card.giver.trim().slice(0, 40),
+        redeemed: card.redeemed,
+      }));
+      return;
+    }
+
+    const legacyRedeemed = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) || "[]");
+    if (!Array.isArray(legacyRedeemed)) return;
+
+    const savedIds = new Set(legacyRedeemed.filter((id) => typeof id === "string"));
     cards.forEach((card) => {
       card.redeemed = savedIds.has(card.id);
     });
@@ -88,10 +125,9 @@ function loadRedeemedCards() {
   }
 }
 
-function saveRedeemedCards() {
+function saveCards() {
   try {
-    const redeemedIds = cards.filter((card) => card.redeemed).map((card) => card.id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(redeemedIds));
+    localStorage.setItem(CARDS_STORAGE_KEY, JSON.stringify(cards));
   } catch {
     // In restricted browsing modes, state simply lasts for this visit.
   }
@@ -135,6 +171,74 @@ function renderRedeemedDeck() {
     item.append(message, giver);
     redeemedList.append(item);
   });
+}
+
+function renderManagerCards() {
+  managerCardCount.textContent = `${cards.length} ${cards.length === 1 ? "card" : "cards"}`;
+  managerList.replaceChildren();
+
+  cards.forEach((card) => {
+    const item = document.createElement("article");
+    item.className = "manager-card";
+
+    const copy = document.createElement("div");
+    copy.className = "manager-card-copy";
+
+    const message = document.createElement("p");
+    message.className = "manager-card-message";
+    message.textContent = card.message;
+
+    const meta = document.createElement("p");
+    meta.className = "manager-card-meta";
+    meta.append(`来自 ${card.giver}`);
+    if (card.redeemed) {
+      const status = document.createElement("span");
+      status.className = "is-redeemed";
+      status.textContent = " · Redeemed";
+      meta.append(status);
+    }
+
+    const editButton = document.createElement("button");
+    editButton.className = "edit-card-button";
+    editButton.type = "button";
+    editButton.dataset.cardId = card.id;
+    editButton.textContent = "Edit";
+    editButton.setAttribute("aria-label", `Edit card from ${card.giver}`);
+
+    copy.append(message, meta);
+    item.append(copy, editButton);
+    managerList.append(item);
+  });
+}
+
+function resetCardForm() {
+  cardForm.reset();
+  editingCardId.value = "";
+  saveCardButton.textContent = "Add to the deck";
+  cancelEditButton.hidden = true;
+}
+
+function refreshDeckAfterCardChange() {
+  updateCount();
+  renderRedeemedDeck();
+  renderManagerCards();
+
+  if (currentCard) {
+    const refreshedCurrentCard = cards.find((card) => card.id === currentCard.id);
+    if (refreshedCurrentCard) {
+      currentCard = refreshedCurrentCard;
+      cardMessage.textContent = currentCard.message;
+      cardGiver.textContent = currentCard.giver;
+    }
+  }
+
+  if (!availableCards().length) {
+    showCompletion();
+  } else if (!revealView.hidden && currentCard) {
+    showView(revealView);
+  } else {
+    showView(deckView);
+  }
 }
 
 function showView(view) {
@@ -209,7 +313,7 @@ anotherButton.addEventListener("click", () => {
 redeemButton.addEventListener("click", () => {
   if (isAnimating || !currentCard) return;
   currentCard.redeemed = true;
-  saveRedeemedCards();
+  saveCards();
   updateCount();
   renderRedeemedDeck();
   redeemedDetails.open = true;
@@ -222,9 +326,73 @@ redeemButton.addEventListener("click", () => {
   }
 });
 
-loadRedeemedCards();
+manageButton.addEventListener("click", () => {
+  managerStatus.textContent = "";
+  renderManagerCards();
+  managerDialog.showModal();
+});
+
+managerClose.addEventListener("click", () => {
+  managerDialog.close();
+});
+
+cancelEditButton.addEventListener("click", () => {
+  resetCardForm();
+  managerStatus.textContent = "Edit cancelled.";
+  managerMessage.focus();
+});
+
+managerList.addEventListener("click", (event) => {
+  const editButton = event.target.closest(".edit-card-button");
+  if (!editButton) return;
+
+  const card = cards.find((item) => item.id === editButton.dataset.cardId);
+  if (!card) return;
+
+  editingCardId.value = card.id;
+  managerMessage.value = card.message;
+  managerGiver.value = card.giver;
+  saveCardButton.textContent = "Save changes";
+  cancelEditButton.hidden = false;
+  managerStatus.textContent = `Editing ${card.giver}’s card.`;
+  managerMessage.focus();
+  managerMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+cardForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const message = managerMessage.value.trim();
+  const giver = managerGiver.value.trim();
+  if (!message || !giver) return;
+
+  const cardId = editingCardId.value;
+  if (cardId) {
+    const card = cards.find((item) => item.id === cardId);
+    if (!card) return;
+    card.message = message;
+    card.giver = giver;
+    managerStatus.textContent = "Card updated on this device.";
+  } else {
+    cards.push({
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      message,
+      giver,
+      redeemed: false,
+    });
+    managerStatus.textContent = "New card added to this device.";
+  }
+
+  saveCards();
+  resetCardForm();
+  refreshDeckAfterCardChange();
+  managerMessage.focus();
+});
+
+loadCards();
 updateCount();
 renderRedeemedDeck();
+renderManagerCards();
 
 if (availableCards().length === 0) {
   showCompletion();
